@@ -51,8 +51,15 @@ class reCAPTCHATemplateOperator {
 		switch( $operatorName )
 		{
 			case 'recaptcha_get_html':
-		    include_once( 'extension/recaptcha/classes/recaptchalib.php' );
 
+/*require_once('extension/classes/ReCaptcha/ReCaptcha.php');
+require_once('extension/classes/ReCaptcha/RequestMethod.php');
+require_once('extension/classes/ReCaptcha/RequestParameters.php');
+require_once('extension/classes/ReCaptcha/Response.php');
+require_once('extension/classes/ReCaptcha/RequestMethod/Post.php');
+require_once('extension/classes/ReCaptcha/RequestMethod/Socket.php');
+require_once('extension/classes/ReCaptcha/RequestMethod/SocketPost.php');
+*/
         // Retrieve the reCAPTCHA public key from the ini file                              
         $ini = eZINI::instance( 'recaptcha.ini' );
         $key = $ini->variable( 'Keys', 'PublicKey' );
@@ -69,11 +76,19 @@ class reCAPTCHATemplateOperator {
         // return nothing so that no captcha is displayed
         $currentUser = eZUser::currentUser();
         $accessAllowed = $currentUser->hasAccessTo( 'recaptcha', 'bypass_captcha' );
-        if ($accessAllowed["accessWord"] == 'yes')
+        if ($accessAllowed["accessWord"] == 'yes') {
           $operatorValue = 'User bypasses CAPTCHA';
+	}
         else
-          // Run the HTML generation code from the reCAPTCHA PHP library 
-  				$operatorValue = recaptcha_get_html($key);
+	{
+$r_html = '
+<div class="g-recaptcha" data-sitekey="'.$key.'"></div>
+            <script type="text/javascript"
+                    src="https://www.google.com/recaptcha/api.js?hl=cs">
+            </script>';			
+
+$operatorValue = $r_html;
+	}
 				break;
 		}
 	}

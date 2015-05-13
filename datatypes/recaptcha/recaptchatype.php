@@ -22,7 +22,16 @@
 // Include the super class file
 include_once( "kernel/classes/ezdatatype.php" );
 // Include reCAPTCHA lib
-include_once( "extension/recaptcha/classes/recaptchalib.php" );
+//include_once( "extension/recaptcha/classes/recaptchalib.php" );
+require_once('extension/recaptcha/classes/ReCaptcha/ReCaptcha.php');
+require_once('extension/recaptcha/classes/ReCaptcha/RequestMethod.php');
+require_once('extension/recaptcha/classes/ReCaptcha/RequestParameters.php');
+require_once('extension/recaptcha/classes/ReCaptcha/Response.php');
+require_once('extension/recaptcha/classes/ReCaptcha/RequestMethod/Post.php');
+require_once('extension/recaptcha/classes/ReCaptcha/RequestMethod/Socket.php');
+require_once('extension/recaptcha/classes/ReCaptcha/RequestMethod/SocketPost.php');
+
+
 
 // Define the name of datatype string
 define( "EZ_DATATYPESTRING_RECAPTCHA", "recaptcha" );
@@ -106,13 +115,9 @@ class recaptchaType extends eZDataType
         // try our luck with the first entry
         $privatekey = array_shift($privatekey);
     }
-    $recaptcha_challenge_field = $http->postVariable('recaptcha_challenge_field');
-    $recaptcha_response_field = $http->postVariable('recaptcha_response_field');
-    $resp = recaptcha_check_answer ($privatekey,
-                                $_SERVER["REMOTE_ADDR"],
-                                $recaptcha_challenge_field,
-                                $recaptcha_response_field);
-    return $resp->is_valid;
+    $recaptcha = new \ReCaptcha\ReCaptcha($privatekey);
+    $resp = $recaptcha->verify($_POST['g-recaptcha-response'], $_SERVER['REMOTE_ADDR']);
+    return $resp->isSuccess();
   }
 
 }
